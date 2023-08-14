@@ -5,6 +5,12 @@
       "bundler": "metro"
     },
     "name": "frontend",
-    "slug": "frontend"
+    "slug": "frontend",
+    "android": {
+      "package": "com.anonymous.frontend"
+    },
+    "ios": {
+      "supportsTablet": true
+    }
   }
 }
