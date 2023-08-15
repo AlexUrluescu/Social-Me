@@ -8,6 +8,7 @@ import Svg, { Line } from "react-native-svg";
 
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
+import * as Facebook from "expo-auth-session/providers/facebook";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -20,7 +21,7 @@ WebBrowser.maybeCompleteAuthSession();
 export default function App() {
   // useStates ---------------------------------------
   const [token, setToken] = useState("");
-  const [userInfo, setUserInfo] = useState(null);
+  const [user, setUser] = useState(null);
 
   // connection with Google ---------------------------------------------------
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -30,6 +31,38 @@ export default function App() {
     webClientId:
       "210894720167-1n0sehlr9do7og5unpl4asnjd40o4c0t.apps.googleusercontent.com",
   });
+
+  const [request_fb, response_fb, promptAsync_fb] = Facebook.useAuthRequest({
+    clientId: "150415564765489"
+  })
+
+  useEffect(() => {
+    if(response_fb && response_fb.type === "success" && response_fb.authentication){
+      (async () => {
+        const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${response_fb.authentication.accessToken}&fields=id,name,picture.type(large)`)
+
+        const infoUser = await userInfoResponse.json()
+        setUser(infoUser)
+        const obiectString = JSON.stringify(infoUser, null, 2);
+        console.log(obiectString);
+        localStorage.setItem("@user", obiectString)
+
+
+      })();
+    }
+  }, [response_fb])
+
+  const handlePressAsync = async () => {
+    const result = await promptAsync_fb();
+    if(result.type !== "success"){
+      alert("something went wrong")
+      return;
+    }
+
+    // setUser(result)
+
+    console.log(result);
+  }
 
   useEffect(() => {
     handleEffect();
@@ -43,7 +76,7 @@ export default function App() {
         getUserInfo(response.authentication.accessToken);
       }
     } else {
-      setUserInfo(user);
+      setUser(user);
       console.log("loaded locally");
     }
   }
@@ -66,7 +99,7 @@ export default function App() {
 
       const user = await response.json();
       await AsyncStorage.setItem("@user", JSON.stringify(user));
-      setUserInfo(user);
+      setUser(user);
     } catch (error) {
       console.log(error);
     }
@@ -88,7 +121,7 @@ export default function App() {
         <View>
           <View style={styles.header}>
             <View style={styles.container_image}>
-              <Image source={{ uri: userInfo?.picture }} style={styles.image} />
+              <Image source={{ uri: user?.picture }} style={styles.image} />
             </View>
             <View style={styles.container_title}>
               <Text style={styles.title}>SocialMe</Text>
@@ -99,12 +132,12 @@ export default function App() {
           </View>
           <View style={styles.container_main}>
             <View style={styles.main_name}>
-              <Text style={styles.main_text}>{userInfo?.name}</Text>
+              <Text style={styles.main_text}>{user?.name}</Text>
             </View>
 
             <View style={styles.container_main_image}>
               <Image
-                source={{ uri: userInfo?.picture }}
+                source={{ uri: user?.picture }}
                 style={styles.main_image}
               />
             </View>
@@ -155,6 +188,19 @@ export default function App() {
       ) : (
         <View>
             <CustomButton title={"Sign in Google"} onPress={promptAsync}/>
+            <CustomButton disabled={!request_fb} title={"Sign in Facebook"} onPress={handlePressAsync}/>
+            <View style={styles.container}>
+            {user ? (
+              // <Profile user={user} />
+             <Text style={styles.name}>{user.name}</Text>
+            ) : (
+              <Button
+                disabled={!request_fb}
+                title="Sign in with Facebook"
+                onPress={handlePressAsync}
+              />
+            )}
+          </View>
             {/* <CustomButton title={}/> */}
           {/* <Button
             title="remove local store"
@@ -273,4 +319,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-});
+})
+
