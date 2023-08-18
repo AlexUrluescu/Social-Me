@@ -18,10 +18,18 @@ import CustomButton from "../components/CustomButton";
 //
 WebBrowser.maybeCompleteAuthSession();
 
+// let userData = {
+//   name: "",
+//   email: "",
+//   picture: ""
+// }
+
 export default function App() {
+  let dataUser = {}
   // useStates ---------------------------------------
   const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
+  const [ userData, setUserData ] = useState({})
 
   // connection with Google ---------------------------------------------------
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -37,15 +45,33 @@ export default function App() {
   })
 
   useEffect(() => {
+
+    // if(localStorage.getItem("user")){
+    //   console.log("exista user");
+    // }
+    // else{
+    //   localStorage.setItem("user", JSON.stringify(userData))
+    //   console.log(userData);
+    // }
+
     if(response_fb && response_fb.type === "success" && response_fb.authentication){
       (async () => {
         const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${response_fb.authentication.accessToken}&fields=id,name,picture.type(large)`)
 
         const infoUser = await userInfoResponse.json()
         setUser(infoUser)
+        console.log(infoUser.picture.data);
         const obiectString = JSON.stringify(infoUser, null, 2);
         console.log(obiectString);
-        localStorage.setItem("@user", obiectString)
+        console.log(obiectString.picture);
+        // userData = localStorage.getItem("user")
+        userData.name = infoUser.name
+        userData.email = "none"
+        userData.picture = infoUser.picture.data.url
+
+        console.log(userData);
+
+        localStorage.setItem("@user", JSON.stringify(userData))
 
 
       })();
@@ -98,7 +124,10 @@ export default function App() {
       );
 
       const user = await response.json();
-      await AsyncStorage.setItem("@user", JSON.stringify(user));
+      userData.name = user.name
+      userData.email = user.email
+      userData.picture = user.picture
+      await AsyncStorage.setItem("@user", JSON.stringify(userData));
       setUser(user);
     } catch (error) {
       console.log(error);
