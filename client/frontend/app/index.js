@@ -1,7 +1,8 @@
 
 // hooks from react and components ---------------------------------
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from "react-native";
+// import styled from 'styled-components/native';
 
 // creating lines in the interface ----------------------------------
 import Svg, { Line } from "react-native-svg";
@@ -128,6 +129,7 @@ export default function App() {
       userData.email = user.email
       userData.picture = user.picture
       await AsyncStorage.setItem("@user", JSON.stringify(userData));
+      
       setUser(user);
     } catch (error) {
       console.log(error);
@@ -217,17 +219,24 @@ export default function App() {
       ) : (
         <View>
             <CustomButton title={"Sign in Google"} onPress={promptAsync}/>
+            <TouchableOpacity style={styles.google_button} onPress={() =>  console.log("google")}>
+              <Image style={styles.google_buttonImage} source={require('../static/google.jpg')} />
+              {/* <Text>Google</Text> */}
+            </TouchableOpacity>
+
             <CustomButton disabled={!request_fb} title={"Sign in Facebook"} onPress={handlePressAsync}/>
             <View style={styles.container}>
             {user ? (
               // <Profile user={user} />
              <Text style={styles.name}>{user.name}</Text>
+             
             ) : (
               <Button
                 disabled={!request_fb}
                 title="Sign in with Facebook"
                 onPress={handlePressAsync}
               />
+              
             )}
           </View>
             {/* <CustomButton title={}/> */}
@@ -348,5 +357,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
+  google_button: {
+    borderRadius: "20px",
+    width: 30,
+    height: 30
+  },
+  google_buttonImage: {
+    width: 30,
+    height: 30
+  } 
 })
 
