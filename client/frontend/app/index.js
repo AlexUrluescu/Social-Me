@@ -37,7 +37,7 @@ export default function App() {
   const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState({});
-
+  const [refresh, setRefresh] = useState(false);
 
   // connection with Google ---------------------------------------------------
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -156,6 +156,11 @@ export default function App() {
     console.log("Friends");
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem("@user");
+    setRefresh(!refresh);
+  }
+
   return (
     <View style={styles.container}>
       {localStorage.getItem("@user") ? (
@@ -170,7 +175,7 @@ export default function App() {
             <View style={styles.container_icon}>
               <TouchableOpacity
                 // style={styles.google_button}
-                onPress={() => console.log("sign-out")}
+                onPress={handleSignOut}
               >
                 <Icon name="sign-out" size={30} color="#900" />
               </TouchableOpacity>
