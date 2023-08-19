@@ -275,6 +275,16 @@ export default function App() {
                 source={require("../static/facebook.png")}
               />
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.google_button}
+              onPress={() => console.log("linkedin sign-up")}
+            >
+              <Image
+                style={styles.google_buttonImage}
+                source={require("../static/linkedin.png")}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       )}
