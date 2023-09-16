@@ -1,7 +1,14 @@
-
 // hooks from react and components ---------------------------------
 import { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Button, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+// import styled from 'styled-components/native';
 
 // creating lines in the interface ----------------------------------
 import Svg, { Line } from "react-native-svg";
@@ -18,18 +25,12 @@ import CustomButton from "../components/CustomButton";
 //
 WebBrowser.maybeCompleteAuthSession();
 
-// let userData = {
-//   name: "",
-//   email: "",
-//   picture: ""
-// }
-
 export default function App() {
-  let dataUser = {}
+  let userData = {};
   // useStates ---------------------------------------
   const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
-  const [ userData, setUserData ] = useState({})
+  const [refresh, setRefresh] = useState(false);
 
   // connection with Google ---------------------------------------------------
   const [request, response, promptAsync] = Google.useAuthRequest({
@@ -41,72 +42,92 @@ export default function App() {
   });
 
   const [request_fb, response_fb, promptAsync_fb] = Facebook.useAuthRequest({
-    clientId: "150415564765489"
-  })
+    clientId: "150415564765489",
+  });
 
   useEffect(() => {
+    // THIS IS A TEST FUNCTION WHERE I CAN GET MORE INFO ABOUT THE USER USING FACEBOOK
 
-    // if(localStorage.getItem("user")){
-    //   console.log("exista user");
-    // }
-    // else{
-    //   localStorage.setItem("user", JSON.stringify(userData))
-    //   console.log(userData);
+    // const test_function = async () => {
+    //   try {
+    //     const res = await fetch("https://graph.facebook.com/v17.0/me?fields=id%2Cname%2Cbirthday%2Cgender%2Chometown%2Cemail%2Cage_range%2Cphotos%2Cposts%2Cvideos%2Clink%2Cfriends&access_token=EAACIzVpOeTEBOxPtBzAfZByFgEGFxjn4MgICTyMkgUTTvMvt7kZCP9Ge3blml62jHWzO7i8WM5c5wVW0ZAQOiA5Vgb5hUtlAmO3DZCg7zSgLpnbbRgAwaZBm31TZC0rXZA6nQkPo6pkoYAhHCnwy7nc6ZCq8iEZAUvlpvk7Kniotyl8nJYHsK3n08PtevLN7Gy5ICMpaBfhrwnWmdzqxVIQ6ZA0Y75BX7naFPMYPEfmC38QjZBlLg74uyeZAdHzQg8cCgAZDZD")
+    //     const data = await res.json()
+
+    //     console.log("a trecut");
+    //     console.log(data);
+        
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
     // }
 
-    if(response_fb && response_fb.type === "success" && response_fb.authentication){
+    // test_function()
+
+    if (
+      response_fb &&
+      response_fb.type === "success" &&
+      response_fb.authentication
+    ) {
       (async () => {
-        const userInfoResponse = await fetch(`https://graph.facebook.com/me?access_token=${response_fb.authentication.accessToken}&fields=id,name,picture.type(large)`)
+        const userInfoResponse = await fetch(
+          `https://graph.facebook.com/me?access_token=${response_fb.authentication.accessToken}&fields=id,name,picture.type(large)`
+        );
 
-        const infoUser = await userInfoResponse.json()
-        setUser(infoUser)
+        const infoUser = await userInfoResponse.json();
+        setUser(infoUser);
+        console.log(infoUser);
+
         console.log(infoUser.picture.data);
         const obiectString = JSON.stringify(infoUser, null, 2);
         console.log(obiectString);
         console.log(obiectString.picture);
-        // userData = localStorage.getItem("user")
-        userData.name = infoUser.name
-        userData.email = "none"
-        userData.picture = infoUser.picture.data.url
+        console.log(`Access-token:${response_fb.authentication.accessToken}`);
+
+        // I create a custom object with the name: "userData" where i put the infomation that i want about the user
+        // I create this object beacuse when I logging with google or facebook, both services return to me a diferent json
+        userData.name = infoUser.name;
+        userData.email = "none";
+        userData.picture = infoUser.picture.data.url;
 
         console.log(userData);
 
-        localStorage.setItem("@user", JSON.stringify(userData))
-
-
+        localStorage.setItem("@user", JSON.stringify(userData));
       })();
     }
-  }, [response_fb])
+  }, [response_fb]);
 
   const handlePressAsync = async () => {
     const result = await promptAsync_fb();
-    if(result.type !== "success"){
-      alert("something went wrong")
+    if (result.type !== "success") {
+      alert("something went wrong");
       return;
     }
 
-    // setUser(result)
 
     console.log(result);
-  }
+  };
 
   useEffect(() => {
+     const handleEffect = async () => {
+      const user = await getLocalUser();
+      console.log("user", user);
+      if (!user) {
+        console.log("new user");
+        if (response?.type === "success") {
+          console.log("get the new user infomation");
+          getUserInfo(response.authentication.accessToken);
+        }
+      } else {
+        console.log("the user is already logged");
+        setUser(user);
+        console.log("loaded locally");
+      }
+    }
+
     handleEffect();
   }, [response, token]);
 
-  async function handleEffect() {
-    const user = await getLocalUser();
-    console.log("user", user);
-    if (!user) {
-      if (response?.type === "success") {
-        getUserInfo(response.authentication.accessToken);
-      }
-    } else {
-      setUser(user);
-      console.log("loaded locally");
-    }
-  }
-
+  
   const getLocalUser = async () => {
     const data = await AsyncStorage.getItem("@user");
     if (!data) return null;
@@ -124,24 +145,31 @@ export default function App() {
       );
 
       const user = await response.json();
-      userData.name = user.name
-      userData.email = user.email
-      userData.picture = user.picture
+      userData.name = user.name;
+      userData.email = user.email;
+      userData.picture = user.picture;
       await AsyncStorage.setItem("@user", JSON.stringify(userData));
+
       setUser(user);
+      console.log(user);
     } catch (error) {
       console.log(error);
     }
   };
 
-// function of the family button ----------------
+  // function of the family button ----------------
   const handleFamilyButton = () => {
     console.log("Family");
-  }
+  };
 
-// function of the friends button ----------------
+  // function of the friends button ----------------
   const handleFriendsButton = () => {
     console.log("Friends");
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem("@user");
+    setRefresh(!refresh);
   }
 
   return (
@@ -156,7 +184,12 @@ export default function App() {
               <Text style={styles.title}>SocialMe</Text>
             </View>
             <View style={styles.container_icon}>
-              <Icon name="home" size={30} color="#900" />
+              <TouchableOpacity
+                // style={styles.google_button}
+                onPress={handleSignOut}
+              >
+                <Icon name="sign-out" size={30} color="#900" />
+              </TouchableOpacity>
             </View>
           </View>
           <View style={styles.container_main}>
@@ -195,16 +228,28 @@ export default function App() {
                 {/* <View style={styles.button}>
                   <Text style={{ fontSize: "25px" }}>+</Text>
                 </View> */}
-                <CustomButton onPress={handleFamilyButton} style={styles.button} title="+" />
-                <View><Text style={{fontSize: "20px"}}>Add family</Text></View>
+                <CustomButton
+                  onPress={handleFamilyButton}
+                  style={styles.button}
+                  title="+"
+                />
+                <View>
+                  <Text style={{ fontSize: "20px" }}>Add family</Text>
+                </View>
               </View>
 
               <View style={styles.container_button}>
                 {/* <View style={styles.button}>
                   <Text style={{ fontSize: "25px" }}>+</Text>
                 </View> */}
-                <CustomButton onPress={handleFriendsButton} style={styles.button} title="+" />
-                <View><Text style={{fontSize: "20px"}}>Add friends</Text></View>
+                <CustomButton
+                  onPress={handleFriendsButton}
+                  style={styles.button}
+                  title="+"
+                />
+                <View>
+                  <Text style={{ fontSize: "20px" }}>Add friends</Text>
+                </View>
               </View>
             </View>
           </View>
@@ -212,29 +257,46 @@ export default function App() {
           <View style={styles.footer}>
             <Text>@SocialMe copyrights</Text>
           </View>
-
         </View>
       ) : (
         <View>
-            <CustomButton title={"Sign in Google"} onPress={promptAsync}/>
-            <CustomButton disabled={!request_fb} title={"Sign in Facebook"} onPress={handlePressAsync}/>
-            <View style={styles.container}>
-            {user ? (
-              // <Profile user={user} />
-             <Text style={styles.name}>{user.name}</Text>
-            ) : (
-              <Button
-                disabled={!request_fb}
-                title="Sign in with Facebook"
-                onPress={handlePressAsync}
-              />
-            )}
+          <View style={styles.title_login_container}>
+            <Text style={styles.title_login}>SocialMe</Text>
           </View>
-            {/* <CustomButton title={}/> */}
-          {/* <Button
-            title="remove local store"
-            onPress={async () => await AsyncStorage.removeItem("@user")}
-          // /> */}
+          <View style={styles.signUp_text_container}>
+            <Text style={styles.signUp_text}>SingUp</Text>
+          </View>
+          <View style={styles.buttons_login_container}>
+            <TouchableOpacity
+              style={styles.google_button}
+              onPress={promptAsync}
+            >
+              <Image
+                style={styles.google_buttonImage}
+                source={require("../static/google.png")}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.google_button}
+              onPress={handlePressAsync}
+            >
+              <Image
+                style={styles.google_buttonImage}
+                source={require("../static/facebook.png")}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.google_button}
+              onPress={() => console.log("linkedin sign-up")}
+            >
+              <Image
+                style={styles.google_buttonImage}
+                source={require("../static/linkedin.png")}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -242,6 +304,33 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  title_login_container: {
+    // backgroundColor: "red",
+    marginTop: "100px",
+    textAlign: "center",
+  },
+  title_login: {
+    fontSize: "50px",
+    fontWeight: "bold",
+  },
+  signUp_text_container: {
+    // backgroundColor: "blue",
+    textAlign: "center",
+    marginTop: "90px",
+  },
+  signUp_text: {
+    fontSize: "30px",
+  },
+  buttons_login_container: {
+    // backgroundColor: "pink",
+    marginTop: "50px",
+
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "30px",
+  },
   image: {
     width: 50,
     height: 50,
@@ -348,5 +437,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-})
 
+  google_button: {
+    borderRadius: "20px",
+    // width: 60,
+    // height: 60,
+  },
+  google_buttonImage: {
+    width: 60,
+    height: 60,
+  },
+});
