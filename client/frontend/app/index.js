@@ -25,18 +25,11 @@ import CustomButton from "../components/CustomButton";
 //
 WebBrowser.maybeCompleteAuthSession();
 
-// let userData = {
-//   name: "",
-//   email: "",
-//   picture: ""
-// }
-
 export default function App() {
-  let dataUser = {};
+  let userData = {};
   // useStates ---------------------------------------
   const [token, setToken] = useState("");
   const [user, setUser] = useState(null);
-  const [userData, setUserData] = useState({});
   const [refresh, setRefresh] = useState(false);
 
   // connection with Google ---------------------------------------------------
@@ -53,13 +46,21 @@ export default function App() {
   });
 
   useEffect(() => {
-    // if(localStorage.getItem("user")){
-    //   console.log("exista user");
+
+    // const test_function = async () => {
+    //   try {
+    //     const res = await fetch("https://graph.facebook.com/v17.0/me?fields=id%2Cname%2Cbirthday%2Cgender%2Chometown%2Cemail%2Cage_range%2Cphotos%2Cposts%2Cvideos%2Clink%2Cfriends&access_token=EAACIzVpOeTEBOxPtBzAfZByFgEGFxjn4MgICTyMkgUTTvMvt7kZCP9Ge3blml62jHWzO7i8WM5c5wVW0ZAQOiA5Vgb5hUtlAmO3DZCg7zSgLpnbbRgAwaZBm31TZC0rXZA6nQkPo6pkoYAhHCnwy7nc6ZCq8iEZAUvlpvk7Kniotyl8nJYHsK3n08PtevLN7Gy5ICMpaBfhrwnWmdzqxVIQ6ZA0Y75BX7naFPMYPEfmC38QjZBlLg74uyeZAdHzQg8cCgAZDZD")
+    //     const data = await res.json()
+
+    //     console.log("a trecut");
+    //     console.log(data);
+        
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
     // }
-    // else{
-    //   localStorage.setItem("user", JSON.stringify(userData))
-    //   console.log(userData);
-    // }
+
+    // test_function()
 
     if (
       response_fb &&
@@ -73,11 +74,13 @@ export default function App() {
 
         const infoUser = await userInfoResponse.json();
         setUser(infoUser);
+        console.log(infoUser);
+
         console.log(infoUser.picture.data);
         const obiectString = JSON.stringify(infoUser, null, 2);
         console.log(obiectString);
         console.log(obiectString.picture);
-        // userData = localStorage.getItem("user")
+        console.log(`Access-token:${response_fb.authentication.accessToken}`);
         userData.name = infoUser.name;
         userData.email = "none";
         userData.picture = infoUser.picture.data.url;
@@ -96,7 +99,6 @@ export default function App() {
       return;
     }
 
-    // setUser(result)
 
     console.log(result);
   };
