@@ -46,6 +46,7 @@ export default function App() {
   });
 
   useEffect(() => {
+    // THIS IS A TEST FUNCTION WHERE I CAN GET MORE INFO ABOUT THE USER USING FACEBOOK
 
     // const test_function = async () => {
     //   try {
@@ -81,6 +82,9 @@ export default function App() {
         console.log(obiectString);
         console.log(obiectString.picture);
         console.log(`Access-token:${response_fb.authentication.accessToken}`);
+
+        // I create a custom object with the name: "userData" where i put the infomation that i want about the user
+        // I create this object beacuse when I logging with google or facebook, both services return to me a diferent json
         userData.name = infoUser.name;
         userData.email = "none";
         userData.picture = infoUser.picture.data.url;
@@ -104,22 +108,26 @@ export default function App() {
   };
 
   useEffect(() => {
+     const handleEffect = async () => {
+      const user = await getLocalUser();
+      console.log("user", user);
+      if (!user) {
+        console.log("new user");
+        if (response?.type === "success") {
+          console.log("get the new user infomation");
+          getUserInfo(response.authentication.accessToken);
+        }
+      } else {
+        console.log("the user is already logged");
+        setUser(user);
+        console.log("loaded locally");
+      }
+    }
+
     handleEffect();
   }, [response, token]);
 
-  async function handleEffect() {
-    const user = await getLocalUser();
-    console.log("user", user);
-    if (!user) {
-      if (response?.type === "success") {
-        getUserInfo(response.authentication.accessToken);
-      }
-    } else {
-      setUser(user);
-      console.log("loaded locally");
-    }
-  }
-
+  
   const getLocalUser = async () => {
     const data = await AsyncStorage.getItem("@user");
     if (!data) return null;
@@ -143,6 +151,7 @@ export default function App() {
       await AsyncStorage.setItem("@user", JSON.stringify(userData));
 
       setUser(user);
+      console.log(user);
     } catch (error) {
       console.log(error);
     }
