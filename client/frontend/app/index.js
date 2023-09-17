@@ -20,8 +20,6 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import * as Facebook from "expo-auth-session/providers/facebook";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Icon from "react-native-vector-icons/FontAwesome";
-// import { useFonts } from 'react-native-google-fonts/Roboto';
 
 // Custom Components -------------------------------------------------
 import CustomButton from "../components/CustomButton";
@@ -50,7 +48,6 @@ export default function App() {
     clientId: "150415564765489",
   });
 
-
   useEffect(() => {
     // THIS IS A TEST FUNCTION WHERE I CAN GET MORE INFO ABOUT THE USER USING FACEBOOK
 
@@ -61,7 +58,7 @@ export default function App() {
 
     //     console.log("a trecut");
     //     console.log(data);
-        
+
     //   } catch (error) {
     //     console.log(error);
     //   }
@@ -109,12 +106,11 @@ export default function App() {
       return;
     }
 
-
     console.log(result);
   };
 
   useEffect(() => {
-     const handleEffect = async () => {
+    const handleEffect = async () => {
       const user = await getLocalUser();
       console.log("user", user);
       if (!user) {
@@ -128,12 +124,11 @@ export default function App() {
         setUser(user);
         console.log("loaded locally");
       }
-    }
+    };
 
     handleEffect();
   }, [response, token]);
 
-  
   const getLocalUser = async () => {
     const data = await AsyncStorage.getItem("@user");
     if (!data) return null;
@@ -166,7 +161,6 @@ export default function App() {
   // function of the family button ----------------
   const handleFamilyButton = () => {
     console.log("Family");
-
   };
 
   // function of the friends button ----------------
@@ -177,29 +171,14 @@ export default function App() {
   const handleSignOut = () => {
     localStorage.removeItem("@user");
     setRefresh(!refresh);
-  }
+  };
 
   return (
     <View style={styles.container}>
       {localStorage.getItem("@user") ? (
         <View>
-          {/* <NavBar /> */}
-          <View style={styles.header}>
-            <View style={styles.container_image}>
-              <Image source={{ uri: user?.picture }} style={styles.image} />
-            </View>
-            <View style={styles.container_title}>
-              <Text style={styles.title}>SocialMe</Text>
-            </View>
-            <View style={styles.container_icon}>
-              <TouchableOpacity
-                // style={styles.google_button}
-                onPress={handleSignOut}
-              >
-                <Icon name="sign-out" size={30} color="black" />
-              </TouchableOpacity>
-            </View>
-          </View>
+          <NavBar userPicture={user?.picture} signOutFunction={handleSignOut} />
+
           <View style={styles.container_main}>
             <View style={styles.main_name}>
               <Text style={styles.main_text}>{user?.name}</Text>
@@ -239,7 +218,7 @@ export default function App() {
                 <CustomButton
                   onPress={handleFamilyButton}
                   style={styles.button}
-                  title={<Link href='/addFamily'>+</Link>}
+                  title={<Link href="/addFamily">+</Link>}
                 />
                 <View>
                   <Text style={{ fontSize: "20px" }}>Add family</Text>
@@ -253,7 +232,7 @@ export default function App() {
                 <CustomButton
                   onPress={handleFriendsButton}
                   style={styles.button}
-                  title={<Link href='/addFriends'>+</Link>}
+                  title={<Link href="/addFriends">+</Link>}
                 />
                 <View>
                   <Text style={{ fontSize: "20px" }}>Add friends</Text>
@@ -318,9 +297,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  container:{
+  container: {
     // backgroundColor: "blue",
-    fontFamily: 'Poppins'
+    fontFamily: "Poppins",
   },
 
   title_login: {
@@ -361,8 +340,9 @@ const styles = StyleSheet.create({
     paddingTop: "10px",
     display: "flex",
     flexDirection: "row",
-    marginTop: "10px"
+    marginTop: "10px",
   },
+
   container_image: {
     width: "20%",
     // backgroundColor: "green",
@@ -371,6 +351,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   container_title: {
     width: "60%",
     // backgroundColor: "orange",
@@ -378,19 +359,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+
   container_icon: {
     // backgroundColor: "blue",
     width: "20%",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-  
   },
 
   title: {
     fontSize: "30px",
-    fontFamily: 'Arial'
-
+    fontFamily: "Arial",
   },
   container_main: {
     // backgroundColor: "red",
@@ -422,7 +402,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: "10px"
+    marginBottom: "10px",
   },
 
   main_text: {
