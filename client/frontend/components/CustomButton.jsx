@@ -29,4 +29,41 @@ const styles = StyleSheet.create({
     letterSpacing: 0.25,
     color: 'white',
   },
+
+  drop_btn: {
+    width: "250px",
+    height: "250px",
+    
+    // box-shadow: inset 20px 20px 20px rgba(0, 0, 0, 0.05),
+    // 10px 10px 40px rgba(0, 0, 0, 0.05),
+    // 10px 30px 30px rgba(0, 0, 0, 0.05),
+    // inset -20px -20px 25px rgba(255, 255, 255, 0.9),
+
+    // border-radius: 50%,
+
+    // transition: all ease .5s,
+
+    // display: flex,
+    // justify-content: center,
+    // align-items: center,
+  }
 });
+
+
+// .drop_btn_treshold{
+//   /* background-color:  #333; */
+//   width: 250px;
+//   height: 250px;
+//   box-shadow: inset 20px 20px 20px rgba(0, 0, 0, 0.05),
+//   10px 10px 40px rgba(0, 0, 0, 0.05),
+//   10px 30px 30px rgba(0, 0, 0, 0.05),
+//   inset -20px -20px 25px rgba(255, 255, 255, 0.9);
+
+//   border-radius: 50%;
+
+//   transition: all ease .5s;
+
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+// }

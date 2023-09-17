@@ -16,6 +16,7 @@
     "expo-auth-session": "~4.0.3",
     "expo-constants": "~14.2.1",
     "expo-crypto": "~12.2.1",
+    "expo-dev-client": "~2.2.1",
     "expo-linking": "~4.0.1",
     "expo-router": "^1.2.0",
     "expo-splash-screen": "~0.18.2",
@@ -31,7 +32,7 @@
     "react-native-svg": "^13.11.0",
     "react-native-vector-icons": "^10.0.0",
     "react-native-web": "~0.18.7",
-    "expo-dev-client": "~2.2.1"
+    "react-native-webview": "^13.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
